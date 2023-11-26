@@ -12,6 +12,15 @@ import java.util.concurrent.*;
 
 /*
 This class contains details such as the word frequency count for each term and term frequency for each term of the document.
+  
+    Tarea: Paralelizar algoritmo TF-IDF
+   
+    Integrantes:
+    
+    -Escalante Flores, Eduardo       18200147
+    -Tovar Canturin, Daniel Ariel    20200096
+    -Sifuentes Marcelo, Roberto      18200067
+
  */
  class DocumentProperties{
 
@@ -48,7 +57,7 @@ public class Ejemplo {
 
     SortedSet<String> wordList = new TreeSet(String.CASE_INSENSITIVE_ORDER);
 
-    //Calculates inverse Doc frequency.
+    //Calcula la frecuencia inversa del documento.
    public HashMap<String,Double> calculateInverseDocFrequency(DocumentProperties [] docProperties)
     {
 
@@ -73,7 +82,7 @@ public class Ejemplo {
         return InverseDocFreqMap;
     }
 
-    //calculates Term frequency for all terms
+    //Calcula la frecuencia de término para todos los términos.
     public HashMap<String,Double> calculateTermFrequency(HashMap<String,Integer>inputMap) {
 
         HashMap<String ,Double> termFreqMap = new HashMap<>();
@@ -83,7 +92,7 @@ public class Ejemplo {
             sum += val;
         }
 
-        //create a new hashMap with Tf values in it.
+        //Obtén la suma de todos los elementos en el HashMap.
         Iterator it = inputMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
@@ -93,7 +102,7 @@ public class Ejemplo {
         return termFreqMap;
     }
 
-    //Returns if input contains numbers or not
+    //Devuelve si la entrada contiene números o no.
     public  boolean isDigit(String input)
     {
         String regex = "(.)*(\\d)(.)*";
@@ -107,7 +116,7 @@ public class Ejemplo {
         return false;
     }
 
-    //Writes the contents of hashmap to CSV file
+    //Escribe el contenido del HashMap en un archivo CSV.
     public  void outputAsCSV(HashMap<String,Double>treeMap,String OutputPath) throws IOException {
         StringBuilder builder = new StringBuilder();
         for (Map.Entry<String, Double> keymap : treeMap.entrySet()) {
@@ -121,7 +130,7 @@ public class Ejemplo {
         writer.write(content);
         writer.close();
     }
-    //cleaning up the input by removing .,:"
+    //Limpieza de la entrada eliminando . , : "
     public  String cleanseInput(String input)
     {
         String newStr = input.replaceAll("[, . : ;\"]", "");
@@ -129,7 +138,8 @@ public class Ejemplo {
         newStr = newStr.replaceAll("\t","");
         return newStr;
     }
-    // Converts the input text file to hashmap and even dumps the final output as CSV files
+    
+    // Convierte el archivo de texto de entrada a un HashMap y también guarda la salida final como archivos CSV.
     public  HashMap<String, Integer> getTermsFromFile(String Filename,int count,File folder) {
         HashMap<String,Integer> WordCount = new HashMap<String,Integer>();
         BufferedReader reader = null;
@@ -143,9 +153,7 @@ public class Ejemplo {
                 String[] words = line.toLowerCase().split(" ");
                 for(String term : words)
                 {
-                    //cleaning up the term ie removing .,:"
                     term = cleanseInput(term);
-                    //ignoring numbers
                     if(isDigit(term))
                     {
                         continue;
@@ -166,7 +174,6 @@ public class Ejemplo {
                 }
                 line = reader.readLine();
             }
-            // sorting the hashmap
             Map<String, Integer> treeMap = new TreeMap<>(WordCount);
             finalMap = new HashMap<String, Integer>(treeMap);
         }
@@ -179,7 +186,7 @@ public class Ejemplo {
 
 
     public static void main(String Args[]) throws IOException, InterruptedException, ExecutionException {
-        System.out.print("Enter path for input files ");
+        System.out.print("Ingresa la ruta para los archivos de entrada: ");
         Scanner scan = new Scanner(System.in);
         Ejemplo TfidfObj = new Ejemplo();
         File folder = new File(scan.nextLine());
@@ -222,7 +229,7 @@ public class Ejemplo {
         //calculating InverseDocument frequency
         HashMap<String,Double> inverseDocFreqMap = TfidfObj.calculateInverseDocFrequency(docProperties);
 
-        //Calculating tf-idf
+        //Calculo del tf-idf
         int count = 0;
         for (File file : listOfFiles) {
             if (file.isFile()) {
@@ -242,7 +249,7 @@ public class Ejemplo {
                     tfIDF.put((pair.getKey().toString()),tfIdfValue);
                 }
                 int fileNameNumber = (count+1);
-                String OutPutPath = folder.getAbsolutePath()+"/csvOutput"+file.getName()+fileNameNumber+".csv";
+                String OutPutPath = folder.getAbsolutePath()+"/csvTF-IDF"+file.getName()+fileNameNumber+".csv";
                 TfidfObj.outputAsCSV(tfIDF,OutPutPath);
                 count++;
             }
